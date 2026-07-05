@@ -1,0 +1,70 @@
+{
+  "communication": {
+    "sync_word": [170, 187],
+    "baud_rate": 115200,
+    "udp_send_port": 51600,
+    "udp_recv_port": 51601
+  },
+
+  "logging": {
+    "log_prefix": "flight_log",
+    "extension": "csv"
+  },
+
+  "payload": [
+    {
+      "name": "time_ms",
+      "type": "uint32",
+      "unit": "ms",
+      "description": "マイコン起動からの経過時間"
+    },
+    {
+      "name": "accel_x",
+      "type": "float",
+      "unit": "m/s2",
+      "description": "機体軸方向Xの加速度"
+    },
+    {
+      "name": "accel_y",
+      "type": "float",
+      "unit": "m/s2",
+      "description": "機体軸方向Yの加速度"
+    },
+    {
+      "name": "accel_z",
+      "type": "float",
+      "unit": "m/s2",
+      "description": "機体軸方向Z（進行方向）の加速度"
+    },
+    {
+      "name": "gyro_x",
+      "type": "float",
+      "unit": "deg/s",
+      "description": "X軸回りの角速度"
+    },
+    {
+      "name": "gyro_y",
+      "type": "float",
+      "unit": "deg/s",
+      "description": "Y軸回りの角速度"
+    },
+    {
+      "name": "gyro_z",
+      "type": "float",
+      "unit": "deg/s",
+      "description": "Z軸回りの角速度"
+    },
+    {
+      "name": "pressure",
+      "type": "float",
+      "unit": "Pa",
+      "description": "大気圧"
+    },
+    {
+      "name": "temperature",
+      "type": "float",
+      "unit": "degC",
+      "description": "気温"
+    }
+  ]
+}
