@@ -16,9 +16,9 @@ jobs:
       matrix:
         config:
           [
-            { os: windows-latest, launch_command: "./TelemetryBackend.exe" },
-            { os: macos-latest, launch_command: "./TelemetryBackend" },
-            { os: ubuntu-latest, launch_command: "./TelemetryBackend" },
+            { os: windows-latest, launch_command: "./RealtimePlotBackend.exe" },
+            { os: macos-latest, launch_command: "./RealtimePlotBackend" },
+            { os: ubuntu-latest, launch_command: "./RealtimePlotBackend" },
           ]
 
     name: CI for ${{ matrix.config.os }}
@@ -40,6 +40,6 @@ jobs:
       #   run: ctest -C debug --test-dir test/ --output-on-failure
       #   working-directory: ./build
 
-      - name: Run TelemetryBackend (Dry Run Test)
+      - name: Run RealtimePlotBackend (Dry Run Test)
         run: ${{ matrix.config.launch_command }}
         working-directory: ./application

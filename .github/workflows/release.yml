@@ -7,6 +7,9 @@ on:
       - "v*.*.*.*"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   windows:
     name: Release for Windows
@@ -27,13 +30,13 @@ jobs:
 
       - name: Packaging
         run: |
-          Compress-Archive -Path .\application\ -DestinationPath .\TelemetryBackend-Windows.zip
+          Compress-Archive -Path .\application\ -DestinationPath .\RealtimePlotBackend-Windows.zip
 
       - name: Release assets
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: "TelemetryBackend-Windows.zip"
+          files: "RealtimePlotBackend-Windows.zip"
 
   macOS:
     name: Release for macOS
@@ -54,13 +57,13 @@ jobs:
 
       - name: Packaging
         run: |
-          zip TelemetryBackend-macOS.zip -r ./application/
+          zip RealtimePlotBackend-macOS.zip -r ./application/
 
       - name: Release assets
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: "TelemetryBackend-macOS.zip"
+          files: "RealtimePlotBackend-macOS.zip"
 
   linux:
     name: Release for Linux
@@ -81,10 +84,10 @@ jobs:
 
       - name: Packaging
         run: |
-          zip TelemetryBackend-Linux.zip -r ./application/
+          zip RealtimePlotBackend-Linux.zip -r ./application/
 
       - name: Release assets
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: "TelemetryBackend-Linux.zip"
+          files: "RealtimePlotBackend-Linux.zip"

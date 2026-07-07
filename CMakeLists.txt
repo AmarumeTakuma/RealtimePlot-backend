@@ -8,7 +8,7 @@ if (APPLE)
     set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
 endif()
 
-project(TelemetryBackend)
+project(RealtimePlotBackend)
 
 enable_language(CXX)
 
@@ -63,12 +63,12 @@ set(SOURCE_FILES
 )
 
 # 実行ファイルの作成
-add_executable(TelemetryBackend ${SOURCE_FILES})
+add_executable(RealtimePlotBackend ${SOURCE_FILES})
 
-target_include_directories(TelemetryBackend PRIVATE "src/")
-target_include_directories(TelemetryBackend PRIVATE ${json_SOURCE_DIR}/single_include/nlohmann) 
-target_include_directories(TelemetryBackend PRIVATE ${json_SOURCE_DIR}/single_include)
-target_include_directories(TelemetryBackend PRIVATE ${asio_SOURCE_DIR}/asio/include)
-target_compile_definitions(TelemetryBackend PRIVATE ASIO_STANDALONE)
+target_include_directories(RealtimePlotBackend PRIVATE "src/")
+target_include_directories(RealtimePlotBackend PRIVATE ${json_SOURCE_DIR}/single_include/nlohmann)
+target_include_directories(RealtimePlotBackend PRIVATE ${json_SOURCE_DIR}/single_include)
+target_include_directories(RealtimePlotBackend PRIVATE ${asio_SOURCE_DIR}/asio/include)
+target_compile_definitions(RealtimePlotBackend PRIVATE ASIO_STANDALONE)
 
 # add_subdirectory("test")
