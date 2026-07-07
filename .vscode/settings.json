@@ -1,0 +1,14 @@
+{
+  "editor.formatOnSave": true,
+  "C_Cpp.clang_format_style": "file",
+  "files.associations": {
+    ".clang-format": "yaml"
+  },
+  "cmake.debugConfig": {
+    "console": "integratedTerminal"
+  },
+  "[cpp]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools",
+    "files.encoding": "utf8"
+  }
+}

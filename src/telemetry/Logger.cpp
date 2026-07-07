@@ -26,7 +26,9 @@ bool TelemetryLogger::open(const AppSetting& config, const std::string& default_
 
     if (file_.is_open()) {
         active_fields.clear();
-        // 1. JSONのpayloadから動的にCSVヘッダーを作る
+        
+        file_ << "pc_epoch_ms,";
+
         if (config.data.contains("payload")) {
             for (const auto& item : config.data["payload"]) {
                 std::string name = item["name"].get<std::string>();
@@ -42,6 +44,11 @@ bool TelemetryLogger::open(const AppSetting& config, const std::string& default_
 
 void TelemetryLogger::log(const TelemetryPacket& packet, bool is_launched, uint32_t base_time_ms) {
     if (!file_.is_open()) return;
+
+    // ログを書き込む瞬間にPCの絶対時間を取得
+    auto now = std::chrono::system_clock::now();
+    uint64_t epoch_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    file_ << epoch_ms << ",";
 
     // 2. JSONで有効化されたフィールドだけをCSVに書き込む
     for (const auto& field : active_fields) {

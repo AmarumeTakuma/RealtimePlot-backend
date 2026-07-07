@@ -77,7 +77,7 @@ int main() {
     asio::ip::udp::endpoint send_endpoint(asio::ip::address::from_string("127.0.0.1"), 51600);
 
     // 4. モード選択と実行
-    std::cout << "Select Mode:\n1: Serial Mode (Real ESP32)\n2: CSV Simulation (Prologue)\n3: CSV Simulation (Custom)\nChoice (1-3): ";
+    std::cout << "Select Mode:\n1: Serial Mode (Real MCU)\n2: CSV Simulation (Prologue)\n3: CSV Simulation (Custom)\nChoice (1-3): ";
     std::string choice;
     std::getline(std::cin, choice);
 

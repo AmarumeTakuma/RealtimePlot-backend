@@ -11,7 +11,7 @@ HardwareReceiver::HardwareReceiver(AppSetting& cfg, CommandListener& c, asio::io
 
 void HardwareReceiver::run() {
     std::string port_name;
-    std::cout << "Enter ESP32 COM port (e.g., COM3, /dev/ttyUSB0): ";
+    std::cout << "Enter MCU COM port (e.g., COM3, /dev/ttyUSB0): ";
     std::getline(std::cin, port_name);
 
     // ==========================================
@@ -124,10 +124,15 @@ void HardwareReceiver::run() {
             // 動的になったLogger呼び出し
             logger.log(packet, is_launched, base_time_ms);
 
+            // UDPで送る直前にPCの絶対時間を取得
+            auto now = std::chrono::system_clock::now();
+            uint64_t epoch_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+
             // ==========================================
             // JSONで定義された項目だけを抽出してUDP送信
             // ==========================================
             json j;
+            j["pc_epoch_ms"] = epoch_ms;
             j["base_time"] = base_time_ms; // 必須項目
 
             if (config.data.contains("payload")) {

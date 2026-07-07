@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build-and-test:
+    strategy:
+      matrix:
+        config:
+          [
+            { os: windows-latest, launch_command: "./TelemetryBackend.exe" },
+            { os: macos-latest, launch_command: "./TelemetryBackend" },
+            { os: ubuntu-latest, launch_command: "./TelemetryBackend" },
+          ]
+
+    name: CI for ${{ matrix.config.os }}
+    runs-on: ${{ matrix.config.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: |
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Debug ..
+
+      - name: Build
+        run: cmake --build . --config Debug
+        working-directory: ./build
+
+      # - name: Unit test
+      #   run: ctest -C debug --test-dir test/ --output-on-failure
+      #   working-directory: ./build
+
+      - name: Run TelemetryBackend (Dry Run Test)
+        run: ${{ matrix.config.launch_command }}
+        working-directory: ./application

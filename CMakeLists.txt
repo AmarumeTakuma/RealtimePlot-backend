@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.16.3)
 
-# 【追加】古いCMake設定を読み込んでもエラーで止めないようにする設定
+# 古いCMake設定を読み込んでもエラーで止めないようにする設定
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 
 # Apple M1/Intel Mac対応
@@ -24,10 +24,10 @@ else()
     set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unknown-pragmas -pthread")
 endif()
 
-# 実行ファイルの出力先をbinフォルダに指定
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin)
+# 実行ファイルの出力先を application フォルダに指定
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/application)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/application)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/application)
 
 # --- 外部ライブラリの自動取得 (FetchContent) ---
 include(FetchContent)
@@ -70,3 +70,5 @@ target_include_directories(TelemetryBackend PRIVATE ${json_SOURCE_DIR}/single_in
 target_include_directories(TelemetryBackend PRIVATE ${json_SOURCE_DIR}/single_include)
 target_include_directories(TelemetryBackend PRIVATE ${asio_SOURCE_DIR}/asio/include)
 target_compile_definitions(TelemetryBackend PRIVATE ASIO_STANDALONE)
+
+# add_subdirectory("test")
