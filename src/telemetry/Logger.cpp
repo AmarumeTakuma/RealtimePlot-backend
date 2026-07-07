@@ -9,9 +9,7 @@ namespace fs = std::filesystem;
 
 bool TelemetryLogger::open(const AppSetting& config, const std::string& default_prefix) {
     fs::path logs_dir = fs::current_path() / "application" / "logs";
-    if (!fs::exists(logs_dir)) {
-        fs::create_directories(logs_dir);
-    }
+    if (!fs::exists(logs_dir)) fs::create_directories(logs_dir);
 
     std::string prefix = default_prefix;
     if (config.data.contains("logging") && config.data["logging"].contains("log_prefix")) {
@@ -27,19 +25,43 @@ bool TelemetryLogger::open(const AppSetting& config, const std::string& default_
     file_.open(filename_);
 
     if (file_.is_open()) {
-        file_ << "time_ms,accel_x,accel_y,accel_z,gyro_x,gyro_y,gyro_z,pressure,temperature,is_launched,base_time_ms\n";
+        active_fields.clear();
+        // 1. JSONのpayloadから動的にCSVヘッダーを作る
+        if (config.data.contains("payload")) {
+            for (const auto& item : config.data["payload"]) {
+                std::string name = item["name"].get<std::string>();
+                active_fields.push_back(name);
+                file_ << name << ",";
+            }
+        }
+        file_ << "is_launched,base_time_ms\n";
         return true;
     }
     return false;
 }
 
-void TelemetryLogger::log(uint32_t time_ms, float ax, float ay, float az, float gx, float gy, float gz, float press, float temp, bool is_launched, uint32_t base_time_ms) {
-    if (file_.is_open()) {
-        file_ << time_ms << "," << ax << "," << ay << "," << az << ","
-              << gx << "," << gy << "," << gz << "," << press << ","
-              << temp << "," << (is_launched ? 1 : 0) << "," << base_time_ms << "\n";
-        file_.flush();
+void TelemetryLogger::log(const TelemetryPacket& packet, bool is_launched, uint32_t base_time_ms) {
+    if (!file_.is_open()) return;
+
+    // 2. JSONで有効化されたフィールドだけをCSVに書き込む
+    for (const auto& field : active_fields) {
+        if (field == "time_ms") file_ << packet.time << ",";
+        else if (field == "accel_x") file_ << packet.accel_x << ",";
+        else if (field == "accel_y") file_ << packet.accel_y << ",";
+        else if (field == "accel_z") file_ << packet.accel_z << ",";
+        else if (field == "gyro_x") file_ << packet.gyro_x << ",";
+        else if (field == "gyro_y") file_ << packet.gyro_y << ",";
+        else if (field == "gyro_z") file_ << packet.gyro_z << ",";
+        else if (field == "mag_x") file_ << packet.mag_x << ",";
+        else if (field == "mag_y") file_ << packet.mag_y << ",";
+        else if (field == "mag_z") file_ << packet.mag_z << ",";
+        else if (field == "pressure") file_ << packet.pressure << ",";
+        else if (field == "temperature") file_ << packet.temperature << ",";
+        else file_ << "0,"; // 未知のフィールド
     }
+    
+    file_ << (is_launched ? 1 : 0) << "," << base_time_ms << "\n";
+    file_.flush();
 }
 
 std::string TelemetryLogger::getFilename() const { return filename_; }

@@ -19,7 +19,8 @@
 #include "app/CommandListener.hpp"
 #include "telemetry/Logger.hpp"
 #include "telemetry/TelemetryPacket.hpp"
-#include "simulator/SimulationCore.hpp"
+#include "telemetry/HardwareReceiver.hpp"
+#include "simulator/CsvSimulator.hpp"
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;

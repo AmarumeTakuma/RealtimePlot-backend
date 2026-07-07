@@ -57,7 +57,8 @@ set(SOURCE_FILES
     "src/app/AppSetting.cpp"
     "src/app/CommandListener.cpp"
     "src/telemetry/Logger.cpp"
-    "src/simulator/SimulationCore.cpp"
+    "src/telemetry/HardwareReceiver.cpp"
+    "src/simulator/CsvSimulator.cpp"
     "src/main.cpp"
 )
 

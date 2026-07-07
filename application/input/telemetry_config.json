@@ -1,6 +1,7 @@
 {
   "communication": {
     "sync_word": [170, 187],
+    "checksum": "xor",
     "baud_rate": 115200,
     "udp_send_port": 51600,
     "udp_recv_port": 51601
@@ -53,6 +54,24 @@
       "type": "float",
       "unit": "deg/s",
       "description": "Z軸回りの角速度"
+    },
+    {
+      "name": "mag_x",
+      "type": "float",
+      "unit": "uT",
+      "description": "X軸の地磁気"
+    },
+    {
+      "name": "mag_y",
+      "type": "float",
+      "unit": "uT",
+      "description": "Y軸の地磁気"
+    },
+    {
+      "name": "mag_z",
+      "type": "float",
+      "unit": "uT",
+      "description": "Z軸の地磁気"
     },
     {
       "name": "pressure",
