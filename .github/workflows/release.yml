@@ -32,7 +32,6 @@ jobs:
         run: |
           mkdir .\RealtimePlotBackend\
           mv .\application\RealtimePlotBackend.exe .\RealtimePlotBackend\
-          mv .\application\realtimeplot_config.json .\RealtimePlotBackend\
           mv .\application\input\ .\RealtimePlotBackend\
           mv .\application\dummy_data\ .\RealtimePlotBackend\
           Compress-Archive -Path .\RealtimePlotBackend\ -DestinationPath .\RealtimePlotBackend-Windows.zip
@@ -64,7 +63,6 @@ jobs:
         run: |
           mkdir RealtimePlotBackend/
           mv ./application/RealtimePlotBackend ./RealtimePlotBackend/
-          mv ./application/realtimeplot_config.json ./RealtimePlotBackend/
           mv ./application/input/ ./RealtimePlotBackend/
           mv ./application/dummy_data/ ./RealtimePlotBackend/
           zip RealtimePlotBackend-macOS.zip -r ./RealtimePlotBackend/
@@ -96,7 +94,6 @@ jobs:
         run: |
           mkdir RealtimePlotBackend/
           mv ./application/RealtimePlotBackend ./RealtimePlotBackend/
-          mv ./application/realtimeplot_config.json ./RealtimePlotBackend/
           mv ./application/input/ ./RealtimePlotBackend/
           mv ./application/dummy_data/ ./RealtimePlotBackend/
           zip RealtimePlotBackend-Linux.zip -r ./RealtimePlotBackend/
