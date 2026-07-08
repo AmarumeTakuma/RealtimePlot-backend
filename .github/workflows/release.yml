@@ -30,7 +30,12 @@ jobs:
 
       - name: Packaging
         run: |
-          Compress-Archive -Path .\application\ -DestinationPath .\RealtimePlotBackend-Windows.zip
+          mkdir .\RealtimePlotBackend\
+          mv .\application\RealtimePlotBackend.exe .\RealtimePlotBackend\
+          mv .\application\realtimeplot_config.json .\RealtimePlotBackend\
+          mv .\application\input\ .\RealtimePlotBackend\
+          mv .\application\dummy_data\ .\RealtimePlotBackend\
+          Compress-Archive -Path .\RealtimePlotBackend\ -DestinationPath .\RealtimePlotBackend-Windows.zip
 
       - name: Release assets
         uses: softprops/action-gh-release@v2
@@ -57,7 +62,12 @@ jobs:
 
       - name: Packaging
         run: |
-          zip RealtimePlotBackend-macOS.zip -r ./application/
+          mkdir RealtimePlotBackend/
+          mv ./application/RealtimePlotBackend ./RealtimePlotBackend/
+          mv ./application/realtimeplot_config.json ./RealtimePlotBackend/
+          mv ./application/input/ ./RealtimePlotBackend/
+          mv ./application/dummy_data/ ./RealtimePlotBackend/
+          zip RealtimePlotBackend-macOS.zip -r ./RealtimePlotBackend/
 
       - name: Release assets
         uses: softprops/action-gh-release@v2
@@ -84,7 +94,12 @@ jobs:
 
       - name: Packaging
         run: |
-          zip RealtimePlotBackend-Linux.zip -r ./application/
+          mkdir RealtimePlotBackend/
+          mv ./application/RealtimePlotBackend ./RealtimePlotBackend/
+          mv ./application/realtimeplot_config.json ./RealtimePlotBackend/
+          mv ./application/input/ ./RealtimePlotBackend/
+          mv ./application/dummy_data/ ./RealtimePlotBackend/
+          zip RealtimePlotBackend-Linux.zip -r ./RealtimePlotBackend/
 
       - name: Release assets
         uses: softprops/action-gh-release@v2
