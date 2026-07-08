@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cmath>  // 【必須】高度計算の std::pow を使うため
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -20,10 +21,16 @@ CsvSimulator::CsvSimulator(AppSetting& cfg,
                            asio::ip::udp::endpoint& ep) :
     config(cfg), cmd(c), io_context(io), send_socket(sock), send_endpoint(ep) {}
 
+// 【対応版】最後の引数に double alt を追加
 void CsvSimulator::sendJson(
-    uint32_t t, uint32_t bt, double temp, double press, double az, double gx, double gy, double gz) {
+    uint32_t t, uint32_t bt, double temp, double press, double az, double gx, double gy, double gz, double alt) {
+    auto now          = std::chrono::system_clock::now();
+    uint64_t epoch_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+
     json j;
-    j["base_time"] = bt;
+    j["pc_epoch_ms"] = epoch_ms;
+    j["base_time"]   = bt;
+    j["altitude"]    = alt;  // 【対応版】高度をJSONに直接ねじ込む
 
     if (config.data.contains("payload")) {
         for (const auto& item : config.data["payload"]) {
@@ -43,7 +50,7 @@ void CsvSimulator::sendJson(
             else if (name == "temperature")
                 j[name] = temp;
             else
-                j[name] = 0.0;  // 地磁気などシミュレーションデータにない項目は0で埋める
+                j[name] = 0.0;
         }
     }
     send_socket.send_to(asio::buffer(j.dump()), send_endpoint);
@@ -64,9 +71,6 @@ void CsvSimulator::run(const std::string& filename, CsvFormat format) {
         headers.push_back(col);
     }
 
-    // =====================================================================
-    // 【データ駆動化】CUSTOMモード時は、JSONの設定からヘッダー名を自動取得
-    // =====================================================================
     std::string h_time  = "time_ms";
     std::string h_press = "pressure";
     std::string h_temp  = "temperature";
@@ -105,13 +109,11 @@ void CsvSimulator::run(const std::string& filename, CsvFormat format) {
             idx_accel = static_cast<int>(i);
     }
 
-    // 必須である時間列が見つからない場合は爆走・クラッシュを避けるため即終了
     if (idx_time == -1) {
         std::cerr << "\n[ERROR] Simulation aborted: Time column '" << h_time << "' not found in CSV." << std::endl;
         return;
     }
 
-    // 各列の初期値の読み込み（安全チェック付き）
     double init_press = 1013.25, init_temp = 15.0, init_accel = 9.81;
     std::streampos data_start_pos = file.tellg();
     if (std::getline(file, line)) {
@@ -156,7 +158,8 @@ void CsvSimulator::run(const std::string& filename, CsvFormat format) {
         pkt.temperature = static_cast<float>(init_temp);
         logger.log(pkt, false, 0);
 
-        sendJson(current_time_ms, 0, init_temp, init_press, init_accel, 0.0, 0.0, 0.0);
+        // 待機中は高度 0.0m
+        sendJson(current_time_ms, 0, init_temp, init_press, init_accel, 0.0, 0.0, 0.0, 0.0);
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
 
@@ -180,7 +183,8 @@ void CsvSimulator::run(const std::string& filename, CsvFormat format) {
         pkt.temperature = static_cast<float>(init_temp);
         logger.log(pkt, true, base_time_ms);
 
-        sendJson(current_time_ms, base_time_ms, init_temp, init_press, init_accel, 0.0, 0.0, 0.0);
+        // カウントダウン中も高度 0.0m
+        sendJson(current_time_ms, base_time_ms, init_temp, init_press, init_accel, 0.0, 0.0, 0.0, 0.0);
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
 
@@ -194,15 +198,12 @@ void CsvSimulator::run(const std::string& filename, CsvFormat format) {
         while (std::getline(row_ss, col, ','))
             row.push_back(col);
 
-        // 行データのサイズチェック
         if (row.size() <= static_cast<size_t>(idx_time))
             continue;
 
         try {
-            // 時間のパースと単位の動的変換
             double t_sec = std::stod(row[idx_time]);
             if (format == CsvFormat::CUSTOM) {
-                // 実機ログなどのカスタムCSVはミリ秒(ms)前提なので、1000で割って秒にする
                 t_sec /= 1000.0;
             }
 
@@ -218,7 +219,6 @@ void CsvSimulator::run(const std::string& filename, CsvFormat format) {
 
             uint32_t current_time_ms = base_time_ms + static_cast<uint32_t>(t_sec * 1000);
 
-            // 各変数のパース（インデックス存在チェック付き）
             double press = init_press;
             if (idx_press != -1 && idx_press < row.size()) {
                 press = (format == CsvFormat::PROLOGUE) ? std::stod(row[idx_press]) / 100.0 : std::stod(row[idx_press]);
@@ -237,9 +237,17 @@ void CsvSimulator::run(const std::string& filename, CsvFormat format) {
             pkt.temperature = static_cast<float>(temp);
             logger.log(pkt, true, base_time_ms);
 
-            sendJson(current_time_ms, base_time_ms, temp, press, accel, 0.0, 0.0, 0.0);
+            // ==========================================
+            // 【対応版】CSVデータからリアルタイムに高度を計算
+            // ==========================================
+            double alt = 0.0;
+            if (init_press > 0.0) {
+                alt = 44330.0 * (1.0 - std::pow(press / init_press, 0.190295));
+            }
+
+            // 引数の末尾に alt を渡して送信
+            sendJson(current_time_ms, base_time_ms, temp, press, accel, 0.0, 0.0, 0.0, alt);
         } catch (...) {
-            // パースエラーが起きてもシステムを落とさず次の行へ
         }
     }
 }
