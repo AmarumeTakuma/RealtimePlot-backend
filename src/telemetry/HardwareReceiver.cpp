@@ -19,7 +19,7 @@ HardwareReceiver::HardwareReceiver(AppSetting& cfg,
 
 void HardwareReceiver::run() {
     std::string port_name;
-    std::cout << "Enter MCU COM port (e.g., COM3, /dev/ttyUSB0): ";
+    std::cout << "Enter MCU COM port (e.g., COM3, /dev/ttyUSB0, /dev/cu.usbserial-...): ";
     std::getline(std::cin, port_name);
 
     // ==========================================
